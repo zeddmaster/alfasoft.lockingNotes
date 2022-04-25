@@ -1,0 +1,51 @@
+<div class="linercrmColoredLeads__settings">
+    <div class="setting-row">
+        <div class="title">
+            Стандартные цвета:
+
+            <div class="subtitle">
+                Нажмите на цвет чтобы включить или отключить
+            </div>
+        </div>
+
+        <div class="colors-list standard-colors">
+
+            {% for i, color in standardColors %}
+                {% if color.active %}
+                    {% set checked = 'checked' %}
+                {% else %}
+                    {% set checked = '' %}
+                {% endif %}
+
+                <div class="color-item">
+                    <input type="checkbox"
+                           name="active[{{ color.tag }}]" value="1"
+                           id="activeColorCheckbox{{ color.tag ~ i }}" {{ checked }}>
+                    <label for="activeColorCheckbox{{ color.tag ~ i }}" data-color="{{ color.tag }}"></label>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="setting-row">
+        <div class="title">
+            Дополнительные цвета:
+        </div>
+        <div class="colors-list personal-colors">
+
+            {% for i, colorHex in personalColors %}
+                <div class="color-item">
+                    <div class="input-group">
+                        <input name="personal[{{ i }}]" type="text" value="{{ colorHex }}">
+                    </div>
+                    <a href="#" class="remove-color"></a>
+                </div>
+            {% endfor %}
+
+            <a href="#" class="add-color-btn">Добавить</a>
+        </div>
+        <input type="text" id="color">
+        <div id="myPicker"></div>
+    </div>
+</div>

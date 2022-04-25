@@ -1,0 +1,174 @@
+<style>
+    #alfa-blocker__user-settings{
+        padding-bottom: 80px;
+    }
+    #alfa-blocker__user-settings table{
+        border: none;
+        width: 100%;
+    }
+    #alfa-blocker__user-settings table thead th {
+        color: #bebebe;
+        padding: 0 0 6px 0;
+        text-align: left;
+    }
+    #alfa-blocker__user-settings table td{
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+    }
+
+    #alfa-blocker__user-settings .text-label{
+        font-weight: 500;
+    }
+
+    #alfa-blocker__user-settings .flex-wrapper{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #alfa-blocker__user-settings section header{
+        font-size: 20px;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+
+    #alfa-blocker__user-settings-form > section + section{
+        margin-top: 30px;
+    }
+
+    #alfa-blocker__user-settings table tr td{
+        width: 50%;
+    }
+</style>
+
+<div id="alfa-blocker__user-settings">
+    <form id="alfa-blocker__user-settings-form">
+        <section>
+            <header>Скрытие воронок и этапов</header>
+            <table>
+                <thead>
+                <tr>
+                    <th>Скрыть воронку</th>
+                    <th>Скрыть статус</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for pipeline in pipelines %}
+                    <tr data-pipeline-id="{{ pipeline.id }}">
+                        <td>
+                            <div class="flex-wrapper">
+                                <div class="text-label pipeline-name">{{ pipeline.name }}</div>
+                                <div class="deny-pipeline__wrapper">
+                                    {{ include_control('checkbox', {
+                                        name: 'denyPipeline',
+                                        value: pipeline.id,
+                                        checked: pipeline.id ~ "" in permissions.denyPipeline
+                                    }) }}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {{ include_control('checkboxes_dropdown', {
+                                items: pipeline._embedded.statuses
+                            }) }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <header>
+                Скрытие разделов и полей
+            </header>
+            <table>
+                <thead>
+                <tr>
+                    <th>Скрыть раздел</th>
+                    <th>Скрыть поле</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Сделки</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'leads',
+                                    checked: "leads" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if custom_fields.leads %}
+                            {{ include_control('checkboxes_dropdown', { items: custom_fields.leads }) }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Покупатели</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'customers',
+                                    checked: "customers" in permissions.denyPipeline
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if custom_fields.customers %}
+                            {{ include_control('checkboxes_dropdown', { items: custom_fields.customers }) }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Компании</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'companies',
+                                    checked: "companies" in permissions.denyPipeline
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if custom_fields.companies %}
+                            {{ include_control('checkboxes_dropdown', { items: custom_fields.companies }) }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Контакты</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'contacts',
+                                    checked: "contacts" in permissions.denyPipeline
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if custom_fields.contacts %}
+                            {{ include_control('checkboxes_dropdown', { items: custom_fields.contacts }) }}
+                        {% endif %}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </form>
+</div>

@@ -1,0 +1,11 @@
+{
+  "widget": {
+    "name": "Widget name",
+    "short_description": "Short description",
+    "description": "Description",
+    "tour_description": "Tour description"
+  },
+  "settings": {
+    "config": "Config field"
+  }
+}

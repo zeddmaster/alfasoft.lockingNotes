@@ -1,0 +1,26 @@
+{
+  "widget": {
+    "name": "widget.name",
+    "description": "widget.description",
+    "short_description": "widget.short_description",
+    "version": "1.b",
+    "interface_version": 2,
+    "init_once": true,
+    "installation": true,
+    "locale": [
+      "ru"
+    ],
+    "support": {
+      "link": "https://alfa-software.ru/",
+      "email": "support@alfa-software.ru"
+    }
+  },
+  "locations": ["everywhere", "settings"],
+  "settings": {
+    "config": {
+      "name": "settings.config",
+      "type": "custom",
+      "required": false
+    }
+  }
+}
