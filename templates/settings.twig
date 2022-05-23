@@ -21,6 +21,7 @@
     }
 
     #alfa-blocker__user-settings .flex-wrapper{
+        height: 39px;
         width: 100%;
         display: flex;
         justify-content: space-between;
@@ -118,7 +119,7 @@
                                 {{ include_control('checkbox', {
                                     name: 'denyEntity',
                                     value: 'customers',
-                                    checked: "customers" in permissions.denyPipeline
+                                    checked: "customers" in permissions.denyEntity
                                 }) }}
                             </div>
                         </div>
@@ -137,7 +138,7 @@
                                 {{ include_control('checkbox', {
                                     name: 'denyEntity',
                                     value: 'companies',
-                                    checked: "companies" in permissions.denyPipeline
+                                    checked: "companies" in permissions.denyEntity
                                 }) }}
                             </div>
                         </div>
@@ -156,7 +157,7 @@
                                 {{ include_control('checkbox', {
                                     name: 'denyEntity',
                                     value: 'contacts',
-                                    checked: "contacts" in permissions.denyPipeline
+                                    checked: "contacts" in permissions.denyEntity
                                 }) }}
                             </div>
                         </div>
@@ -167,8 +168,137 @@
                         {% endif %}
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Рабочий стол</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'dashboard',
+                                    checked: "dashboard" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Задачи</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'todo',
+                                    checked: "todo" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Товары</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'catalogs',
+                                    checked: "catalogs" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Аналитика</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'stats',
+                                    checked: "stats" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                </tbody>
+
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">Настройки</div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Интеграции</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'widgetsSettings',
+                                    checked: "widgetsSettings" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Общие настройки</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'settings',
+                                    checked: "settings" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Пользователи</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'settings-users',
+                                    checked: "settings-users" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="flex-wrapper">
+                            <div class="text-label">Коммуникации</div>
+                            <div class="deny-entity__wrapper">
+                                {{ include_control('checkbox', {
+                                    name: 'denyEntity',
+                                    value: 'settings-communications',
+                                    checked: "settings-communications" in permissions.denyEntity
+                                }) }}
+                            </div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
                 </tbody>
             </table>
+
         </section>
     </form>
 </div>

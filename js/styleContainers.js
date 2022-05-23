@@ -7,7 +7,7 @@ define(function(){
         },
 
         setContainer(id, content, wrapperSelector){
-            wrapperSelector = wrapperSelector || '#page_holder'
+            wrapperSelector = wrapperSelector || 'head'
             if(!this.containerStack[id])
                 this.containerStack[id] = {
                     element: document.createElement('style'),
@@ -17,6 +17,8 @@ define(function(){
             const container = this.containerStack[id]
             container.element.setAttribute('class', 'alfasoftwareLockerStyle-' + id)
             container.element.textContent = content
+
+            this.syncDOM(id)
 
             return this
         },

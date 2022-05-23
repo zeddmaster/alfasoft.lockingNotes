@@ -139,14 +139,6 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
              */
             render: function () {
 
-
-                // -- notes -- //
-                /*if(AmoHelper.env('data.current_entity') === 'settings-users'){
-                    BaseHelper.log('this is user settings')
-                }*/
-                // ----------- //
-
-
                 // Проверить - загружены ли настройки доступа
                 const permissionsPromise = new Promise(r => {
                     if(permissions === undefined) // если настройки не получены - получить и применить
@@ -166,37 +158,150 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
                     BaseHelper.log('current permissions', { permissions })
                     if(!permissions) return
 
-                    // current entity
-                    const currentPipelineID = AmoHelper.env('data.current_view.current_pipeline.id')
-                    const currentEntity = AmoHelper.env('data.current_entity')
-
-                    // [ENTITY:lead-pipeline] deny pipelines
-                    if(currentEntity === 'leads-pipeline' && permissions.denyPipeline) {
-                        if(currentPipelineID && ~permissions.denyPipeline.indexOf(currentPipelineID.toString())){
-                            document.getElementById('pipeline_holder').remove()
-                            document.querySelector('.list__body-right__top').innerHTML = "Воронка не доступна"
-                        }
-                    }
-
-                    // deny pipeline statuses
+                    this.denySections()
+                    this.denyPipelines()
                     this.denyPipelineStatuses()
-
-                    // deny customFields
                     this.denyCardFields()
-
                 })
 
                 return true;
             },
 
 
-            denyPipelines(){
-                const currentPipelineID = AmoHelper.env('data.current_view.current_pipeline.id')
-                const currentEntity = AmoHelper.env('data.current_entity')
+
+            denySections(){
+
+                const denyEntityMap = {
+                    leads: ['leads', 'leads-pipeline'],
+                    contacts: ['contacts'],
+                    todo: ['todo', 'todo-line', 'todo-calendar'],
+                    dashboard: ['dashboard'],
+                    widgetsSettings: ['widgetsSettings'],
+                    settings: ['settings'],
+                    'settings-users': ['settings-users'],
+                    'settings-communications': ['settings-communications'],
+                    stats: ['stats'],
+                    catalogs: ['catalogs'],
+                    companies: ['companies'],
+                    customers: ['customers']
+                }
+
+                let entity = AmoHelper.env('data.current_entity')
+                let denyEntity = permissions?.denyEntity || []
+                if(typeof denyEntity === 'string')
+                    denyEntity = [denyEntity];
+
+                if(~denyEntityMap.leads.indexOf(entity))
+                    entity = 'leads'
+                if(~denyEntityMap.todo.indexOf(entity))
+                    entity = 'todo'
+                if(entity === 'contacts')
+                    entity = AmoHelper.env('data.element_type', 'contacts')
+
+                if(denyEntity.length && denyEntityMap[entity] && ~denyEntity.indexOf(entity)){
+
+                    const pageHolder = document.getElementById('page_holder')
+                    const workArea = document.getElementById('work_area')
+                    const cardHolder = document.getElementById('card_holder')
+
+                    const lockElement = document.createElement('div')
+                    lockElement.setAttribute('style', 'font-weight: bold; font-size: 20px; padding: 40px')
+                    lockElement.innerHTML = "<div>Доступ к разделу запрещен</div>"
+                    // pageHolder.appendChild(lockElement)
+
+                    if(workArea) {
+                        // workArea.style.display = 'none'
+                        workArea.innerHTML = ''
+                        workArea.appendChild(lockElement)
+                    }
+                    else if(pageHolder){
+                        // pageHolder.style.display = 'none'
+                        pageHolder.innerHTML = ''
+                        pageHolder.appendChild(lockElement)
+
+                        if(cardHolder)
+                            cardHolder.style.display = 'none'
+                    }
+                }
+
+                // hide menu items
+                let selectors = [],
+                    styles = ''
+                denyEntity.forEach(i => {
+                    denyEntityMap[i] && denyEntityMap[i].forEach(ii => {
+                        if(ii === 'contacts') return
+                        selectors.push(`[data-entity="${ii}"]`)
+                    })
+                })
+
+                if(selectors.length)
+                    styles = selectors.join(', ') + '{display: none !important;}'
+
+                styleContainers.setContainer('entities', styles)
             },
 
 
+            denyPipelines(){
+
+                BaseHelper.log('run denyPipelines')
+                const currentEntity = AmoHelper.env('data.current_entity')
+
+                if(~['leads-pipeline', 'leads'].indexOf(currentEntity) && permissions.denyPipeline){
+
+                    const pipelines = typeof permissions.denyPipeline === 'string' ? [permissions.denyPipeline] : permissions.denyPipeline
+
+                    const noticeElement = document.createElement("div")
+                    noticeElement.setAttribute('style', 'font-size: 20px; font-weight: bold; padding-left: 40px')
+                    noticeElement.textContent = "Доступ к воронке ограничен"
+
+
+                    if(currentEntity === 'leads'){
+                        const currentPipelineID = AmoHelper.env('data.current_card.model.attributes.lead[PIPELINE_ID]')
+
+                        if(currentPipelineID && ~pipelines.indexOf(currentPipelineID)){
+                            const cardHolder = document.getElementById('card_holder')
+                            const pageHolder = document.getElementById('page_holder')
+                            if(cardHolder){
+                                noticeElement.style.paddingTop = "40px"
+                                cardHolder.style.display = 'none'
+                                if(pageHolder)
+                                    pageHolder.appendChild(noticeElement)
+                            }
+                        }
+                    }
+                    else if(currentEntity === 'leads-pipeline'){
+                        const currentPipelineID = AmoHelper.env('data.current_view.current_pipeline.id')
+
+                        // hide opened pipeline
+                        if(currentPipelineID && ~pipelines.indexOf(currentPipelineID.toString())){
+                            document.getElementById('pipeline_holder').remove()
+                            const topBar = document.querySelector('.list__body-right__top');
+
+                            // notice
+                            if(topBar){
+                                topBar.innerHTML = ""
+                                topBar.appendChild(noticeElement)
+                            }
+                        }
+                    }
+
+
+                    // hide menu item
+                    let selectors = [],
+                        styles = ''
+                    pipelines.forEach(p => selectors.push(`.aside .aside__list-item[data-id="${p}"]`))
+
+                    if(selectors) styles = selectors.join(', ') + '{display:none!important;}'
+                    styleContainers.setContainer('pipelines', styles)
+                }
+            },
+
+
+
             denyPipelineStatuses(){
+
+                BaseHelper.log('run denyPipelineStatuses')
+
                 const entity = AmoHelper.env('data.current_entity')
                 let pipeline_id = AmoHelper.env('data.current_view.current_pipeline.id')
 
@@ -204,8 +309,6 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
                     pipeline_id = AmoHelper.env('data.current_card.model.attributes.lead[PIPELINE_ID]')
 
                 if(permissions.denyPipelineStatus){
-
-                    BaseHelper.log('denyPipelineStatuses handler', {pipeline_id, permissions: permissions.denyPipelineStatus})
 
                     let pipelineStatuses = (typeof permissions.denyPipelineStatus === 'string')
                         ? [permissions.denyPipelineStatus] : permissions.denyPipelineStatus
@@ -223,7 +326,6 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
 
                         if(styleSelector.length){
                             styleContainers.setContainer('pipelineStatuses', styleSelector.join(', ') + "{display: none !important;}")
-                                .syncDOM('pipelineStatuses')
                         }
                     }
 
@@ -235,35 +337,43 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
              * Блокировка полей сущности
              * @param options
              */
-            denyCardFields(options){
-                options = options || {}
-                const currentEntity = options.entity || AmoHelper.env('data.current_entity')
-                const selectorWrap = options.wrap || '#card_fields'
+            denyCardFields(){
+                BaseHelper.log('run denyCardFields')
+                const entity = AmoHelper.env('data.current_entity')
+                let styleSelectors = []
 
-                if(AmoHelper.env('data.current_card')) {
-                    if(permissions.denyCustomField && permissions.denyCustomField[currentEntity]){
-                        if(typeof permissions.denyCustomField[currentEntity] === 'string')
-                            permissions.denyCustomField[currentEntity] = [permissions.denyCustomField[currentEntity]]
-
-                        permissions.denyCustomField[currentEntity].forEach(denyCF_ID => {
-                            const customField = document.querySelector(`${selectorWrap} [name^="${denyCF_ID}"]`)
-                            if(customField) {
-                                const customFieldWrapper = customField.closest('.linked-form__field')
-                                if(customFieldWrapper)
-                                    customFieldWrapper.style.display = 'none'
-                            }
-                        })
-                    }
-
-                    // lead inner entities
-                    // блокировка вложенных сущностей
-                    // например внутри сделки есть поля компании и поля контакта
-                    if(currentEntity === 'leads') {
-                        this.denyCardFields({entity: 'contacts', wrap: '#contacts_list'})
-                        this.denyCardFields({entity: 'companies', wrap: '#companies_list'})
-                    }
-
+                // for base fields
+                if(permissions.denyCustomField && permissions.denyCustomField[entity]){
+                    let perms = permissions.denyCustomField[entity]
+                    perms = typeof perms === 'string' ? [perms] : perms
+                    perms.forEach(cf => {
+                        styleSelectors.push(`.linked-form__field[data-id="${cf}"]`)
+                    })
                 }
+
+                // for custom fields
+                if(permissions.denyField && permissions.denyField[entity]){
+                    let perms = permissions.denyField[entity]
+                    perms = typeof perms === 'string' ? [perms] : perms
+                    perms.forEach(bf => {
+                        let selector
+                        switch (bf){
+                            case 'PRICE':
+                                selector = '.linked-form__field.linked-form__field_budget'
+                                break
+                            case 'MAIN_USER':
+                                selector = '.linked-form__field.linked-form__field_reassign'
+                                break
+                        }
+                        selector && styleSelectors.push(selector)
+                    })
+                }
+
+                // update style container
+                let styles = ''
+                if(styleSelectors.length)
+                    styles = styleSelectors.join(', ') + "{display:none!important;}"
+                styleContainers.setContainer('fields', styles)
             },
 
             dpSettings: function () { return true; },

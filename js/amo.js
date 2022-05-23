@@ -74,8 +74,8 @@ define(['./base.js'], function(_baseHelper){
 
                         // add base fields
                         if(entity === 'leads')
-                            customFields.unshift({ id: 'PRICE', twig_id: 'lead[PRICE]', name: 'Бюджет' })
-                        customFields.unshift({ id: 'MAIN_USER', twig_id: `${singleEntityName}[MAIN_USER]`, name: 'Ответственный' })
+                            customFields.unshift({ id: 'PRICE', name: 'Бюджет', base_field: true })
+                        customFields.unshift({ id: 'MAIN_USER', name: 'Ответственный', base_field: true })
 
                         if(options.twig)
                             customFields = this.customFieldsForTwig(entity, customFields)
@@ -88,10 +88,11 @@ define(['./base.js'], function(_baseHelper){
             // customFields to twig format
             customFieldsForTwig(entity, custom_fields){
                 custom_fields.forEach((field, index) => {
+                    let fieldName = field.base_field ? 'denyField' : 'denyCustomField'
                     custom_fields[index] = {
-                        id: field.twig_id || `CFV[${field.id}]`,
+                        id: field.id,
                         option: field.name,
-                        name: `denyCustomField[${entity}]`
+                        name: `${fieldName}[${entity}]`
                     }
                 })
                 return custom_fields
@@ -146,22 +147,30 @@ define(['./base.js'], function(_baseHelper){
             /**
              * Отметить заблокированные поля
              * для settings.twig
-             * @param customFields
+             * @param twigFields
              * @param permissions
              */
-            setDenyCustomFields(customFields, permissions){
-                const denyCF = permissions.denyCustomField
+            setDenyCustomFields(twigFields, permissions){
 
-                baseHelper.log({customFields, permissions})
-                if(!denyCF) return baseHelper.log(`permissions for custom fields not found'`, denyCF)
+                const fieldStorages = ['denyCustomField', 'denyField']
 
-                for(let entity in customFields){
-                    if(!denyCF[entity]) continue
-                    const entityCustomFields = customFields[entity]
-                    entityCustomFields.forEach(i => {
-                        i.is_checked = ~denyCF[entity].indexOf(i.id)
-                    })
-                }
+                fieldStorages.forEach(storeName => {
+                    const fields = permissions[storeName]
+
+                    baseHelper.log({customFields: twigFields, permissions})
+                    if(!fields) return baseHelper.log(`permissions for custom fields not found'`, {fields, storeName})
+
+                    for(let entity in twigFields){
+                        if(!fields[entity]) continue
+                        const entityCustomFields = twigFields[entity]
+                        entityCustomFields.forEach(i => {
+                            if(!i.processed) {
+                                i.is_checked = !!~fields[entity].indexOf(i.id.toString())
+                                i.processed = true
+                            }
+                        })
+                    }
+                })
             },
 
 
@@ -181,8 +190,8 @@ define(['./base.js'], function(_baseHelper){
 
             // get data from AMOCRM storage
             // Example: env('data.current_entity')
-            env(key){
-                if(!window.AMOCRM) return {}
+            env(key, def){
+                if(!window.AMOCRM) return def || {}
                 if(key){
                     const keys = key.split('.')
                     let envItem = window.AMOCRM
@@ -194,7 +203,7 @@ define(['./base.js'], function(_baseHelper){
                         })
                     }
                     catch (e){
-                        return undefined
+                        return def
                     }
 
                     return envItem

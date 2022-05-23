@@ -8,36 +8,51 @@ define(function(){
 
         return {
 
+            getAccountData(){
+                return window.AMOCRM.constant('account')
+            },
+
+            getUserData(){
+                return window.AMOCRM.constant('user')
+            },
+
+
             // получить права пользователя
             getUserPermissions(user_id){
+                const subdomain = this.getAccountData()?.subdomain
                 user_id = user_id.toString()
 
-                let storage = localStorage.getItem('alfasoftdebugstorage'),
-                    permissions = {}
-                storage = storage ? JSON.parse(storage) : {}
 
-                if(storage.permissions && storage.permissions[user_id])
-                    permissions = storage.permissions[user_id]
-                else
-                    this.log('permissions for user ' + user_id + ' not found')
-
-                return new Promise(resolve => {
-                    resolve(permissions)
-                });
+                return new Promise(r => {
+                    this.httpRequest('https://alfa-software.ru/amo-panel/api/alfa-locker/settings/get', { subdomain, user_id })
+                        .then(response => {
+                            r(response.permissions || {})
+                        })
+                        .catch(() => {
+                            r({})
+                        })
+                })
             },
 
 
             // сохранить права пользователя
             saveUserPermissions(user_id, permissions){
-                let storage = localStorage.getItem('alfasoftdebugstorage')
-                storage = storage ? JSON.parse(storage) : {}
-                storage.permissions = storage.permissions || {}
-                storage.permissions[user_id] = permissions || {}
 
-                localStorage.setItem('alfasoftdebugstorage', JSON.stringify(storage))
+                const subdomain = this.getAccountData()?.subdomain
 
-                return new Promise(resolve => {
-                    resolve();
+
+                return new Promise(r => {
+                    this.httpRequest('https://alfa-software.ru/amo-panel/api/alfa-locker/settings/save', {
+                        user_id, subdomain,
+                        permissions: JSON.stringify(permissions)
+                    })
+                        .then(response => {
+                            console.log(response);
+                            r()
+                        })
+                        .catch(() => {
+                            r()
+                        })
                 })
             },
 
@@ -133,7 +148,7 @@ define(function(){
                         }
                     };
 
-                    xhr.onerror = function(){
+                    xhr.onerror = function(r){
                         reject('Network error');
                     };
 
