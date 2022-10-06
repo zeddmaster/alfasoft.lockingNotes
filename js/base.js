@@ -6,6 +6,7 @@ define(function(){
     return function(widget){
         instance = widget;
 
+
         return {
 
             getAccountData(){
@@ -24,7 +25,7 @@ define(function(){
 
 
                 return new Promise(r => {
-                    this.httpRequest('https://alfa-software.ru/amo-panel/api/alfa-locker/settings/get', { subdomain, user_id })
+                    this.httpRequest('https://amo.alfa-software.ru/api/alfa-locker/settings/get', { subdomain, user_id })
                         .then(response => {
                             r(response.permissions || {})
                         })
@@ -42,7 +43,7 @@ define(function(){
 
 
                 return new Promise(r => {
-                    this.httpRequest('https://alfa-software.ru/amo-panel/api/alfa-locker/settings/save', {
+                    this.httpRequest('https://amo.alfa-software.ru/api/alfa-locker/settings/save', {
                         user_id, subdomain,
                         permissions: JSON.stringify(permissions)
                     })
@@ -91,6 +92,80 @@ define(function(){
                 })
 
                 return object
+            },
+
+
+            getAccountSettings(){
+                let $fields = $('#widget_settings__fields_wrapper input[name]'),
+                    settings = {};
+
+                if(!$fields || !$fields.length)
+                    return settings;
+
+                $fields.each(function(){
+                    let Name = $(this).attr('name');
+
+                    if($(this).is('[type=checkbox]') && !$(this).prop('checked'))
+                        return;
+
+                    if(!Name) return;
+                    settings[Name] = $(this).val();
+                });
+
+                return settings;
+            },
+
+
+            setupAccount(configs){
+
+                this.httpRequest('/private/api/v2/json/accounts/current').then(response => {
+
+
+                    const Account = AMOCRM.constant('account');
+                    const User = AMOCRM.constant('user');
+
+                    let settings = configs?.fields || {},
+                        widgetParams = instance.params,
+                        account = response.response.account,
+                        users = account.users,
+
+                        registerData = {
+                            subdomain: Account.subdomain,
+                            client_id: account.id,
+                            client_name: account.name,
+                            first_name: User.name,
+                            login: User.login,
+                            user_id: User.id,
+                            timezone: Account.timezone,
+                            status: widgetParams.status,
+                            active: widgetParams.active,
+                            widget_active: widgetParams.widget_active,
+                            widget_code: widgetParams.widget_code,
+                            tariff_name: Account.tariffName,
+                            users_count: users.length,
+                            paid_till_date: Account.paid_till,
+                            paid_from: Account.paid_from,
+                            users: []
+                        };
+
+
+                    if(users.length){
+                        users.forEach(user => {
+                            registerData.users.push({
+                                user_id: user.id,
+                                name: `${user.name} ${user.last_name}`,
+                                email: user.login,
+                                phone: user.phone,
+                                is_admin: user.is_admin === "Y"
+                            })
+                        });
+                    }
+                    registerData.users = JSON.stringify(registerData.users);
+                    registerData = Object.assign(registerData, settings);
+
+                    this.httpRequest('https://amo.alfa-software.ru/api/alfa-locker/setup', registerData);
+                });
+
             },
 
 

@@ -1,4 +1,4 @@
-define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _BaseHelper, styleContainers){
+define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.min.js'], function(_AmoHelper, _BaseHelper, styleContainers){
 
     let instance = null
 
@@ -20,6 +20,14 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
 
             // Render setting's page
             settings: function ($modal) {
+                const phoneInput = $modal.find('input[name=phone]')
+
+                if(phoneInput){
+                    phoneInput.mask('+9 (999) 999-99-99');
+                }
+                else
+                    console.log('not found find phone input :(')
+
                 return true;
             },
 
@@ -382,7 +390,8 @@ define(['./amo.js', './base.js', './styleContainers.js'], function(_AmoHelper, _
 
             destroy: function (){},
 
-            onSave: function () {
+            onSave: function (configs) {
+                BaseHelper.setupAccount(configs)
                 return true;
             }
         }

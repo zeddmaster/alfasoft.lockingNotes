@@ -6,6 +6,6 @@
     "tour_description": "Tour description"
   },
   "settings": {
-    "config": "Config field"
+    "phone": "Укажите свой телефон"
   }
 }

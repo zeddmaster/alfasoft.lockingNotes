@@ -17,10 +17,10 @@
   },
   "locations": ["everywhere", "settings"],
   "settings": {
-    "config": {
-      "name": "settings.config",
-      "type": "custom",
-      "required": false
+    "phone": {
+      "name": "settings.phone",
+      "type": "text",
+      "required": true
     }
   }
 }
