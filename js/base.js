@@ -48,7 +48,7 @@ define(function(){
                         permissions: JSON.stringify(permissions)
                     })
                         .then(response => {
-                            console.log(response);
+                            this.log(response);
                             r()
                         })
                         .catch(() => {
