@@ -22,11 +22,15 @@ define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudfla
             settings: function ($modal) {
                 const phoneInput = $modal.find('input[name=phone]')
 
-                if(phoneInput){
-                    phoneInput.mask('+9 (999) 999-99-99');
-                }
+                if(phoneInput)
+                    phoneInput.mask('+9 (999) 999-99-99')
                 else
-                    console.log('not found find phone input :(')
+                    BaseHelper.log('not found find phone input :(')
+
+                // enable Saving-button
+                const saveBtn = $modal.find('.button-input-disabled')
+                if(saveBtn)
+                    saveBtn.removeClass('button-input-disabled')
 
                 return true;
             },
