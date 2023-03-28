@@ -1,7 +1,7 @@
 define(function(){
 
     let instance = null
-    const debug = true
+    const debug = !!localStorage.getItem('AlfaSoftDebug')
 
     return function(widget){
         instance = widget;
