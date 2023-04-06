@@ -4,4 +4,4 @@
 
 ## Building widget.zip
 Run this command: 
-`zip widget.zip * -x .gitignore -r`
+`zip widget.zip * -x .gitignore readme.md -r`
