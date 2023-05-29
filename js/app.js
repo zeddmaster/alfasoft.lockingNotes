@@ -347,7 +347,6 @@ define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudfla
 
             /**
              * Блокировка полей сущности
-             * @param options
              */
             denyCardFields(){
                 BaseHelper.log('run denyCardFields')
