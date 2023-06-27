@@ -219,15 +219,12 @@ define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudfla
                     const lockElement = document.createElement('div')
                     lockElement.setAttribute('style', 'font-weight: bold; font-size: 20px; padding: 40px')
                     lockElement.innerHTML = "<div>Доступ к разделу запрещен</div>"
-                    // pageHolder.appendChild(lockElement)
 
                     if(workArea) {
-                        // workArea.style.display = 'none'
                         workArea.innerHTML = ''
                         workArea.appendChild(lockElement)
                     }
                     else if(pageHolder){
-                        // pageHolder.style.display = 'none'
                         pageHolder.innerHTML = ''
                         pageHolder.appendChild(lockElement)
 
