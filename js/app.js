@@ -180,7 +180,9 @@ define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudfla
             },
 
 
-
+            /**
+             * Скрыть разделы
+             */
             denySections(){
 
                 const denyEntityMap = {
@@ -250,6 +252,9 @@ define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudfla
             },
 
 
+            /**
+             * Скрыть воронки
+             */
             denyPipelines(){
 
                 BaseHelper.log('run denyPipelines')
@@ -306,7 +311,9 @@ define(['./amo.js', './base.js', './styleContainers.js', 'https://cdnjs.cloudfla
             },
 
 
-
+            /**
+             * Скрыть статусы воронки
+             */
             denyPipelineStatuses(){
 
                 BaseHelper.log('run denyPipelineStatuses')
